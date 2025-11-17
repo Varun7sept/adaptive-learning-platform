@@ -1,0 +1,29 @@
+# ================================
+# ROOT GITIGNORE (IMPORTANT)
+# ================================
+
+# --- Node Modules (both frontend and backend if any)
+node_modules/
+
+# --- Python Virtual Environment ---
+venv/
+__pycache__/
+*.pyc
+
+# --- Environment Variables ---
+.env
+.env.*
+
+# --- Build Folders ---
+dist/
+build/
+
+# --- Uploaded Files (optional for security) ---
+uploaded_files/
+
+# --- Logs ---
+*.log
+
+# --- OS Files ---
+Thumbs.db
+.DS_Store

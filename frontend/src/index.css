@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Poppins', sans-serif;
+  @apply bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-gray-100 flex items-center justify-center min-h-screen;
+}
