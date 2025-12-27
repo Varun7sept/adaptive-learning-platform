@@ -67,3 +67,5 @@ def generate_quiz_questions(text: str, num_questions: int = 5):
         return {"error": f"Network error: {str(e)}"}
     except Exception as e:
         return {"error": f"Unexpected error: {str(e)}"}
+
+
