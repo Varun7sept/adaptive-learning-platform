@@ -477,11 +477,13 @@ def analyze_student(student_id: str):
     # 4️⃣ FINAL RESPONSE (EXPLAINABLE AGENT OUTPUT)
     # ------------------------------------------------------
     return {
-        "weak_concepts": weakest_topics,
-        "topic_scores": topic_scores,
-        "explainability": {
-            "method": "SHAP/LIME (Concept-Level)",
-            "details": topic_explanations
-        },
-        "llm_analysis": llm_output
-    }
+    "weak_concepts": [
+        {
+            "concept": topic,
+            "weakness_score": topic_scores[topic],
+            "explainability": topic_explanations[topic]
+        }
+        for topic in weakest_topics
+    ],
+    "llm_analysis": llm_output
+}

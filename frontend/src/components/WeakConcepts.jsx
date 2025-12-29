@@ -189,6 +189,119 @@
 // export default WeakConcepts;
 
 
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// const WeakConcepts = () => {
+//   const navigate = useNavigate();
+//   const studentId = "student_123";
+
+//   const [loading, setLoading] = useState(true);
+//   const [analysis, setAnalysis] = useState(null);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     const fetchWeakConcepts = async () => {
+//       try {
+//         const res = await fetch(
+//           `http://127.0.0.1:8000/api/agent/weak_concepts/${studentId}`
+//         );
+
+//         const data = await res.json();
+//         console.log("🔥 RAW WEAK CONCEPTS:", data);
+
+//         if (!data.agent_analysis) {
+//           setError("No weak concepts found.");
+//           setLoading(false);
+//           return;
+//         }
+
+//         // Try parsing JSON string
+//         let parsed;
+//         try {
+//           parsed = JSON.parse(data.agent_analysis);
+//         } catch {
+//           parsed = data.agent_analysis;
+//         }
+
+//         setAnalysis(parsed);
+//       } catch (err) {
+//         console.error(err);
+//         setError("Network or server error.");
+//       }
+
+//       setLoading(false);
+//     };
+
+//     fetchWeakConcepts();
+//   }, []);
+
+//   // Loading Screen
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center text-white text-3xl">
+//         ⏳ Loading Weak Concepts...
+//       </div>
+//     );
+//   }
+
+//   // Error Screen
+//   if (error) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-pink-600 text-white text-3xl">
+//         ⚠️ {error}
+//         <button
+//           onClick={() => navigate("/evaluation")}
+//           className="mt-6 bg-white text-indigo-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition"
+//         >
+//           Go Back
+//         </button>
+//       </div>
+//     );
+//   }
+
+//   // MAIN UI
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-600 p-10 text-white">
+//       <h1 className="text-4xl font-extrabold mb-10">🔍 Weak Concepts</h1>
+
+//       {/* Weak Concepts */}
+//       <div className="space-y-6">
+//         {analysis?.weak_concepts?.map((item, i) => (
+//           <div
+//             key={i}
+//             className="bg-white/20 backdrop-blur-md p-6 rounded-2xl border border-white/30 shadow-xl"
+//           >
+//             <h2 className="text-xl font-semibold text-yellow-300 mb-2">
+//               {i + 1}. {item.concept}
+//             </h2>
+
+//             <p className="text-gray-200">{item.why_weak}</p>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Summary */}
+//       <div className="bg-white/10 p-6 rounded-xl border border-white/20 mt-8">
+//         <h2 className="text-2xl font-semibold text-green-300 mb-2">📘 Summary</h2>
+//         <p className="text-gray-200">{analysis?.summary}</p>
+//       </div>
+
+//       <div className="text-center mt-10">
+//         <button
+//           onClick={() => navigate("/evaluation")}
+//           className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition"
+//         >
+//           📑 Other Agents
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default WeakConcepts;
+
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -197,46 +310,26 @@ const WeakConcepts = () => {
   const studentId = "student_123";
 
   const [loading, setLoading] = useState(true);
-  const [analysis, setAnalysis] = useState(null);
+  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchWeakConcepts = async () => {
-      try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/agent/weak_concepts/${studentId}`
-        );
-
-        const data = await res.json();
-        console.log("🔥 RAW WEAK CONCEPTS:", data);
-
-        if (!data.agent_analysis) {
+    fetch(`http://127.0.0.1:8000/api/agent/weak_concepts/${studentId}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.weak_concepts || res.weak_concepts.length === 0) {
           setError("No weak concepts found.");
-          setLoading(false);
-          return;
+        } else {
+          setData(res);
         }
-
-        // Try parsing JSON string
-        let parsed;
-        try {
-          parsed = JSON.parse(data.agent_analysis);
-        } catch {
-          parsed = data.agent_analysis;
-        }
-
-        setAnalysis(parsed);
-      } catch (err) {
-        console.error(err);
-        setError("Network or server error.");
-      }
-
-      setLoading(false);
-    };
-
-    fetchWeakConcepts();
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Server error");
+        setLoading(false);
+      });
   }, []);
 
-  // Loading Screen
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white text-3xl">
@@ -245,14 +338,13 @@ const WeakConcepts = () => {
     );
   }
 
-  // Error Screen
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-pink-600 text-white text-3xl">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-pink-600 text-white">
         ⚠️ {error}
         <button
           onClick={() => navigate("/evaluation")}
-          className="mt-6 bg-white text-indigo-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition"
+          className="mt-6 bg-white text-indigo-700 px-6 py-3 rounded-xl font-semibold"
         >
           Go Back
         </button>
@@ -260,14 +352,13 @@ const WeakConcepts = () => {
     );
   }
 
-  // MAIN UI
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-600 p-10 text-white">
-      <h1 className="text-4xl font-extrabold mb-10">🔍 Weak Concepts</h1>
+      <h1 className="text-4xl font-extrabold mb-10">🔍 Weak Concepts (Explainable AI)</h1>
 
       {/* Weak Concepts */}
       <div className="space-y-6">
-        {analysis?.weak_concepts?.map((item, i) => (
+        {data.weak_concepts.map((item, i) => (
           <div
             key={i}
             className="bg-white/20 backdrop-blur-md p-6 rounded-2xl border border-white/30 shadow-xl"
@@ -276,21 +367,46 @@ const WeakConcepts = () => {
               {i + 1}. {item.concept}
             </h2>
 
-            <p className="text-gray-200">{item.why_weak}</p>
+            <p className="text-gray-200 mb-4">{item.why_weak}</p>
+
+            {/* Explainability */}
+            <div className="bg-white/10 p-4 rounded-xl">
+              <h3 className="text-lg font-semibold mb-2">
+                🔍 Explainability (SHAP/LIME)
+              </h3>
+
+              {(data.numeric_explainability.details[item.concept] || []).map(
+                (exp, idx) => (
+                  <p key={idx} className="text-sm text-gray-100">
+                    • <b>{exp.feature}</b>: {exp.impact} (
+                    <span
+                      className={
+                        exp.direction === "negative"
+                          ? "text-red-300"
+                          : "text-green-300"
+                      }
+                    >
+                      {exp.direction}
+                    </span>
+                    )
+                  </p>
+                )
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Summary */}
-      <div className="bg-white/10 p-6 rounded-xl border border-white/20 mt-8">
+      <div className="bg-white/10 p-6 rounded-xl border border-white/20 mt-10">
         <h2 className="text-2xl font-semibold text-green-300 mb-2">📘 Summary</h2>
-        <p className="text-gray-200">{analysis?.summary}</p>
+        <p className="text-gray-200">{data.summary}</p>
       </div>
 
       <div className="text-center mt-10">
         <button
           onClick={() => navigate("/evaluation")}
-          className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition"
+          className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold"
         >
           📑 Other Agents
         </button>
